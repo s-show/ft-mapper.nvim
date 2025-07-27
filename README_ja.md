@@ -89,7 +89,7 @@ require("ft-mapper").setup({
 
 ## 🔍 使用例
 
-![demo](./images/demo-1080p.webm)
+[demo-1080p.webm](https://github.com/user-attachments/assets/2199d944-4c01-42eb-8f54-d9bc25840a5b)
 
 ## 🛠️ 高度な機能
 
