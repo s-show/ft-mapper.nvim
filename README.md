@@ -1,10 +1,10 @@
 # ft-mapper.nvim
 
-A Neovim plugin that enhances `f`, `F`, `t`, and `T` motions to search for multiple character variants with a single keystroke. Perfect for multilingual environments where you want to search for both half-width and full-width characters seamlessly.
+A Neovim plugin that extends `f`, `F`, `t`, and `T` motions to search for multiple character variants with a single keystroke. Perfect for multilingual environments where half-width and full-width characters are mixed.
 
 ## ✨ Features
 
-- **Multi-character search**: Search for multiple character variants with a single keystroke
+- **Multi-character search**: Search for multiple character variants with a single keystroke (e.g., `f,` jumps to `,`, `、`, or `，`)
 - **Full-width/Half-width support**: Seamlessly handle Japanese, Chinese, and other full-width characters
 - **Preserves native behavior**: Falls back to default Vim behavior for unmapped characters
 - **Repeat support**: Works with `;` and `,` for repeating searches
@@ -15,36 +15,20 @@ A Neovim plugin that enhances `f`, `F`, `t`, and `T` motions to search for multi
 
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
+Here's the configuration for [lazy.nvim](https://github.com/folke/lazy.nvim). No default mappings are provided, so `mappings` must be configured.
+
 ```lua
 {
   "your-username/ft-mapper.nvim",
   config = function()
     require("ft-mapper").setup({
       mappings = {
-        -- Search for both half-width and full-width commas
         { ",", "、", "，" },
-        -- Search for both half-width and full-width periods  
         { ".", "。", "．" },
-        -- Search for both half-width and full-width colons
         { ":", "：" },
+        { "[", "「", "『", "【", "［" },
+        { "]", "」", "』", "】", "］" },
         -- Add more mappings as needed
-      }
-    })
-  end
-}
-```
-
-### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
-
-```lua
-use {
-  "your-username/ft-mapper.nvim",
-  config = function()
-    require("ft-mapper").setup({
-      mappings = {
-        { ",", "、", "，" },
-        { ".", "。", "．" },
-        { ":", "：" },
       }
     })
   end
@@ -53,14 +37,20 @@ use {
 
 ## ⚙️ Configuration
 
-The plugin requires a `mappings` table where each entry is an array:
-- First element: The character you type
-- Remaining elements: Additional characters to search for
+### Configuration Options
+
+- `mappings (string[][])`
+    - Configure the key combinations for `f` or `t` and the characters you want to search for.
+    - Example: { ",", "、", "，" }
+    - First element: The character to type with `f` or `t` (like `,` in `f,`)
+    - Remaining elements: Characters to search for when typing `f,`
+- `debug (boolean)`
+    - Enable debug output for troubleshooting. Should normally be `false`.
 
 ```lua
 require("ft-mapper").setup({
   mappings = {
-    -- When you type 'f,' it will find ',', '、', or '，'
+    -- This configuration is designed with Japanese in mind.
     { ",", "、", "，" },
     { ".", "。", "．" },
     { ":", "：" },
@@ -99,21 +89,10 @@ Count prefixes are supported:
 
 ## 🔍 Example Use Cases
 
-### Japanese Text
-```
-これは、テストです。次の文、そして最後の文。
-```
-- `f,` from the beginning jumps to any of the commas
-- `F。` from the end jumps backward to any of the periods
-
-### Mixed Language Documents
-```
-Hello, world! こんにちは、世界！
-```
-- `f!` finds both `!` and `！`
-- `f,` finds both `,` and `、`
+![demo](./images/demo-1080p.webm)
 
 ### Code Comments with Full-width Characters
+
 ```python
 # 設定ファイルを読み込む。エラーの場合、デフォルト値を使用。
 if not config:
@@ -137,6 +116,8 @@ require("ft-mapper").setup({
 
 ```vim
 :lua require("ft-mapper").show_config()
+" or
+:= require("ft-mapper").show_config()
 ```
 
 ## 📋 Requirements
@@ -144,14 +125,22 @@ require("ft-mapper").setup({
 - Neovim 0.7.0 or higher
 - No external dependencies
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Original Plugin
 
-Inspired by the need for better multilingual text navigation in Neovim, especially for developers working with Japanese, Chinese, and other languages that use full-width characters.
+This plugin is a Lua rewrite and extension of [juro106/ftjpn](https://github.com/juro106/ftjpn), which I used daily.
+
+Thanks to [juro106/ftjpn](https://github.com/juro106/ftjpn) for creating a plugin that improves the efficiency of editing Japanese documents.
+
+## FAQ
+
+### Q: Why do I need this plugin?
+
+A: In documents mixing Japanese and English, punctuation marks often appear in both half-width (,) and full-width (、) forms. While the normal `f,` only searches for half-width commas, this plugin allows you to search for both.
+
+### Q: Can I add custom mappings?
+
+A: Simply add new entries to the `mappings` table. The first element is the input character, and the rest are the search target characters.
