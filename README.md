@@ -89,7 +89,7 @@ Count prefixes are supported:
 
 ## 🔍 Example Use Cases
 
-![demo](./images/demo-1080p.webm)
+[demo-1080p.webm](https://github.com/user-attachments/assets/2199d944-4c01-42eb-8f54-d9bc25840a5b)
 
 ### Code Comments with Full-width Characters
 
