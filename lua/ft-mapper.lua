@@ -13,7 +13,7 @@ M.last_search = {
   char = nil,
   chars = nil,
   last_target_index = nil, -- 最後に移動した位置を記録
-  last_position = nil -- 最後のカーソル位置を記録
+  last_position = nil      -- 最後のカーソル位置を記録
 }
 
 -- 文字マッピングテーブルを構築
@@ -95,17 +95,17 @@ local function do_search(command, char, count, search_chars, is_repeat)
 
   -- 同じコマンドが前回と同じ位置で実行されたかチェック
   local is_same_position = false
-  if M.last_search.command == command and 
-     M.last_search.char == char and
-     M.last_search.last_position and
-     M.last_search.last_position[1] == line_num and
-     M.last_search.last_position[2] == byte_col then
+  if M.last_search.command == command and
+      M.last_search.char == char and
+      M.last_search.last_position and
+      M.last_search.last_position[1] == line_num and
+      M.last_search.last_position[2] == byte_col then
     is_same_position = true
   end
 
   if M.config.debug then
     print(string.format("=== Search Debug ==="))
-    print(string.format("Command: %s, Char: %s, Count: %d, Repeat: %s, Same Position: %s", 
+    print(string.format("Command: %s, Char: %s, Count: %d, Repeat: %s, Same Position: %s",
       command, char, count, tostring(is_repeat), tostring(is_same_position)))
     print(string.format("Line: %s", line))
     print(string.format("Current byte col: %d, char index: %d", byte_col, char_index))
@@ -134,11 +134,6 @@ local function do_search(command, char, count, search_chars, is_repeat)
     -- 前方検索
     -- 同じコマンドの繰り返しで、前回と同じ位置にいる場合は、次の文字から検索
     local start_index = char_index + 1
-    if (is_repeat or is_same_position) and M.last_search.last_target_index == char_index then
-      -- 現在の文字を飛ばす（既に次の文字から始まっているので変更なし）
-      start_index = char_index + 1
-    end
-
     for i = start_index, line_length - 1 do
       local c = vim.fn.strcharpart(line, i, 1)
       if M.config.debug then
@@ -178,13 +173,8 @@ local function do_search(command, char, count, search_chars, is_repeat)
     end
   elseif command == 't' then
     -- 前方検索（文字の手前まで）
-    -- 現在位置の2つ先から検索を開始（次の文字の次から）
-    local start_index = char_index + 2
-    if (is_repeat or is_same_position) and M.last_search.last_target_index == char_index then
-      -- 繰り返しの場合は、さらに先から検索
-      start_index = char_index + 2
-    end
-    
+    -- 現在位置の次の文字から検索を開始
+    local start_index = char_index + 1
     for i = start_index, line_length - 1 do
       local c = vim.fn.strcharpart(line, i, 1)
       if M.config.debug then
@@ -249,16 +239,16 @@ local function do_search(command, char, count, search_chars, is_repeat)
       char = char,
       chars = search_chars,
       last_target_index = target_index,
-      last_position = {line_num, target_byte_col}
+      last_position = { line_num, target_byte_col }
     }
-    
+
     return true
   else
     if M.config.debug then
       print("Target not found")
     end
     -- ターゲットが見つからなかった場合も位置を更新
-    M.last_search.last_position = {line_num, byte_col}
+    M.last_search.last_position = { line_num, byte_col }
     return false
   end
 end
@@ -296,7 +286,7 @@ local function setup_command(cmd)
         command = cmd,
         char = char,
         chars = { char },
-        last_position = {line_num, byte_col}
+        last_position = { line_num, byte_col }
       }
       return
     end
@@ -308,7 +298,7 @@ local function setup_command(cmd)
     -- 検索を実行
     do_search(cmd, char, count, search_chars, false)
   end, { silent = true })
-  
+
   -- オペレータペンディングモード専用のマッピング
   vim.keymap.set('o', cmd, function()
     -- セットアップされていない場合はエラー
@@ -331,17 +321,45 @@ local function setup_command(cmd)
     local mapping_table = build_mapping_table(M.config.mappings)
     local targets = mapping_table[char]
 
-    -- マッピングが存在しない場合は、通常のコマンドを実行
+    -- マッピングが存在しない場合は、デフォルトのf/tコマンドと同じ動作を実装
     if not targets then
-      -- 通常のf/tコマンドを実行
-      vim.cmd('normal! ' .. count .. cmd .. char)
-      local line_num, byte_col = get_cursor_pos()
-      M.last_search = {
-        command = cmd,
-        char = char,
-        chars = { char },
-        last_position = {line_num, byte_col}
-      }
+      -- ビジュアルモードに入る（マッピングがある場合と同じ）
+      vim.cmd('normal! v')
+
+      -- 通常の検索を実行（単一文字のみ）
+      local found = do_search(cmd, char, count, { char }, false)
+
+      if found then
+        if cmd == 'f' or cmd == 'F' then
+          -- f/F の場合、見つかった文字全体を含める（inclusive）
+          local _, current_col = get_cursor_pos()
+          local line = get_current_line()
+          local target_char_index = byte_to_char_index(line, current_col)
+          local target_char = vim.fn.strcharpart(line, target_char_index, 1)
+          local char_bytes = #target_char
+
+          -- f/Fの場合、文字の最後のバイトまで選択（inclusiveにする）
+          if char_bytes >= 1 then
+            local line_num = vim.api.nvim_win_get_cursor(0)[1]
+            set_cursor_pos(line_num, current_col + char_bytes - 1)
+          end
+
+          -- 方向を調整（Fの場合は逆順になる可能性がある）
+          local start_line, start_col = get_cursor_pos()
+          local start_char_index = byte_to_char_index(line, start_col)
+          if cmd == 'F' and target_char_index < start_char_index then
+            -- 選択範囲を正しく設定
+            local temp_col = current_col
+            set_cursor_pos(start_line, start_col)
+            vim.cmd('normal! o') -- 選択の他端に移動
+            set_cursor_pos(start_line, temp_col)
+          end
+        end
+        -- t/T の場合は特別な処理は不要（exclusive）
+      else
+        -- 見つからなかった場合はビジュアルモードを解除
+        vim.cmd('normal! \27') -- ESC
+      end
       return
     end
 
@@ -353,13 +371,13 @@ local function setup_command(cmd)
     local line = get_current_line()
     local start_line, start_col = get_cursor_pos()
     local start_char_index = byte_to_char_index(line, start_col)
-    
+
     -- 一時的にビジュアルモードに入る
     vim.cmd('normal! v')
-    
+
     -- 検索を実行
     local found = do_search(cmd, char, count, search_chars, false)
-    
+
     if found then
       if cmd == 'f' or cmd == 'F' then
         -- f/F の場合、見つかった文字全体を含める（inclusive）
@@ -367,18 +385,18 @@ local function setup_command(cmd)
         local target_char_index = byte_to_char_index(line, current_col)
         local target_char = vim.fn.strcharpart(line, target_char_index, 1)
         local char_bytes = #target_char
-        
-        -- マルチバイト文字の場合、最後のバイトまで選択
-        if char_bytes > 1 then
+
+        -- f/Fの場合、文字の最後のバイトまで選択（inclusiveにする）
+        if char_bytes >= 1 then
           set_cursor_pos(start_line, current_col + char_bytes - 1)
         end
-        
+
         -- 方向を調整（Fの場合は逆順になる可能性がある）
         if cmd == 'F' and target_char_index < start_char_index then
           -- 選択範囲を正しく設定
           local temp_col = current_col
           set_cursor_pos(start_line, start_col)
-          vim.cmd('normal! o')  -- 選択の他端に移動
+          vim.cmd('normal! o') -- 選択の他端に移動
           set_cursor_pos(start_line, temp_col)
         end
       end
@@ -401,13 +419,13 @@ local function setup_repeat_commands()
     end
 
     local count = vim.v.count1
-    
+
     -- オペレータペンディングモードの場合は特別な処理
     local mode = vim.api.nvim_get_mode().mode
     if mode == 'no' then
       vim.cmd('normal! v')
       do_search(M.last_search.command, M.last_search.char, count, M.last_search.chars, true)
-      
+
       -- f/F の場合、文字全体を選択
       if M.last_search.command == 'f' or M.last_search.command == 'F' then
         local line = get_current_line()
@@ -415,7 +433,7 @@ local function setup_repeat_commands()
         local target_char_index = byte_to_char_index(line, current_col)
         local target_char = vim.fn.strcharpart(line, target_char_index, 1)
         local char_bytes = #target_char
-        
+
         if char_bytes > 1 then
           local line_num = vim.api.nvim_win_get_cursor(0)[1]
           set_cursor_pos(line_num, current_col + char_bytes - 1)
@@ -442,13 +460,13 @@ local function setup_repeat_commands()
       t = 'T',
       T = 't'
     }
-    
+
     -- オペレータペンディングモードの場合は特別な処理
     local mode = vim.api.nvim_get_mode().mode
     if mode == 'no' then
       vim.cmd('normal! v')
       do_search(reverse_cmd[M.last_search.command], M.last_search.char, count, M.last_search.chars, true)
-      
+
       -- f/F の場合、文字全体を選択
       local original_cmd = M.last_search.command
       if original_cmd == 'f' or original_cmd == 'F' then
@@ -457,7 +475,7 @@ local function setup_repeat_commands()
         local target_char_index = byte_to_char_index(line, current_col)
         local target_char = vim.fn.strcharpart(line, target_char_index, 1)
         local char_bytes = #target_char
-        
+
         if char_bytes > 1 then
           local line_num = vim.api.nvim_win_get_cursor(0)[1]
           set_cursor_pos(line_num, current_col + char_bytes - 1)
