@@ -1,6 +1,3 @@
--- ft-mapper.lua
--- マルチバイト文字を半角文字で検索できるようにするNeovimプラグイン
-
 local M = {}
 
 -- 設定（初期値は空）
@@ -362,7 +359,9 @@ local function setup_command(cmd)
       end
       return
     end
+    -- ここまでがマッピングが存在しない場合の処理の実装
 
+    -- ここからマッピングが存在する場合の処理を実装
     -- 検索対象の文字リストを作成
     local search_chars = { char }
     vim.list_extend(search_chars, targets)
