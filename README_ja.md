@@ -105,9 +105,9 @@ Hello, world! こんにちは、世界！
 
 ### デモ動画
 
-[demo_without_operator.webm](https://github.com/s-show/ft-mapper.nvim/raw/refs/heads/main/demo/demo_without_operator.mp4)
+[demo_without_operator.webm](https://github.com/user-attachments/assets/3d070a72-ea37-41a2-b72f-4b805f999c14)
 
-[demo_with_operator.webm](https://github.com/s-show/ft-mapper.nvim/raw/refs/heads/main/demo/demo_with_operator.mp4)
+[demo_with_operator.webm](https://github.com/user-attachments/assets/081f6e68-33d8-4b88-9575-9d6b6501f7a0)
 
 ## 🛠️ 高度な機能
 
