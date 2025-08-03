@@ -89,7 +89,25 @@ require("ft-mapper").setup({
 
 ## 🔍 使用例
 
-[demo-1080p.webm](https://github.com/user-attachments/assets/2199d944-4c01-42eb-8f54-d9bc25840a5b)
+### 日本語テキスト
+```
+これは、テストです。次の文、そして最後の文。
+```
+- 先頭から `f,` でいずれかのコンマにジャンプ
+- 末尾から `F。` でいずれかの句点に後方ジャンプ
+
+### 多言語混在ドキュメント
+```
+Hello, world! こんにちは、世界！
+```
+- `f!` で `!` と `！` の両方を検索
+- `f,` で `,` と `、` の両方を検索
+
+### デモ動画
+
+[demo_without_operator.webm](https://github.com/s-show/ft-mapper.nvim/raw/refs/heads/main/demo/demo_without_operator.webm)
+
+[demo_with_operator.webm](https://github.com/s-show/ft-mapper.nvim/raw/refs/heads/main/demo/demo_with_operator.webm)
 
 ## 🛠️ 高度な機能
 
