@@ -1,4 +1,4 @@
-Output demo2.webp
+Output demo_with_operator.webm
 Set Shell zsh
 Set FontSize 18
 Set Width 1280
