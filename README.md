@@ -89,15 +89,25 @@ Count prefixes are supported:
 
 ## 🔍 Example Use Cases
 
-[demo-1080p.webm](https://github.com/user-attachments/assets/2199d944-4c01-42eb-8f54-d9bc25840a5b)
-
-### Code Comments with Full-width Characters
-
-```python
-# 設定ファイルを読み込む。エラーの場合、デフォルト値を使用。
-if not config:
-    return default_config  # 失敗：設定なし
+### Japanese Text
 ```
+これは、テストです。次の文、そして最後の文。
+```
+- Jump to any comma with `f,` from the beginning
+- Jump backward to any period with `F。` from the end
+
+### Multilingual Mixed Documents
+```
+Hello, world! こんにちは、世界！
+```
+- Search for both `!` and `！` with `f!`
+- Search for both `,` and `、` with `f,`
+
+### Demo Videos
+
+[demo_without_operator.webm](https://github.com/user-attachments/assets/3d070a72-ea37-41a2-b72f-4b805f999c14)
+
+[demo_with_operator.webm](https://github.com/user-attachments/assets/081f6e68-33d8-4b88-9575-9d6b6501f7a0)
 
 ## 🛠️ Advanced Features
 
