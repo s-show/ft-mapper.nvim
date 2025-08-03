@@ -51,8 +51,8 @@ Here's the configuration for [lazy.nvim](https://github.com/folke/lazy.nvim). No
 require("ft-mapper").setup({
   mappings = {
     -- This configuration is designed with Japanese in mind.
-    { ",", "、", "，" },
-    { ".", "。", "．" },
+    { ',', '、', '，' },
+    { '.', '。', '．' },
     { ":", "：" },
     { ";", "；" },
     { "!", "！" },
@@ -62,7 +62,9 @@ require("ft-mapper").setup({
     { "[", "「", "『", "【", "［" },
     { "]", "」", "』", "】", "］" },
     { "'", "'", "'" },
-    { '"', """, """, "«", "»" },
+    { '"', "“", "”", "゛" },
+    { '<', "＜", "«" },
+    { '>', "＞", "»" },
     { "-", "ー", "―", "—", "–" },
     { " ", "　" }, -- half-width and full-width spaces
   },
