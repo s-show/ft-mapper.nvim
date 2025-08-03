@@ -1,4 +1,4 @@
-Output demo_with_operator.webm
+Output demo_with_operator.mp4
 Set Shell zsh
 Set FontSize 18
 Set Width 1280
@@ -12,7 +12,7 @@ Set Margin 20
 Set MarginFill "#674EFF"
 Set CursorBlink false
 
-Type "nvim_demo test2.md"
+Type "nvim_demo ./demo/test_with_operator.md"
 Enter
 Sleep 2s
 
