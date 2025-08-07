@@ -10,6 +10,7 @@ A Neovim plugin that extends `f`, `F`, `t`, and `T` motions to search for multip
 - **Repeat support**: Works with `;` and `,` for repeating searches
 - **Count support**: Compatible with count prefixes (e.g., `3f,`)
 - **All modes supported**: Works in Normal, Visual, and Operator-pending modes
+- **Replace `;`, `,`**: Ability to change `;` and `,` command keys to any other keys
 
 ## 📦 Installation
 
@@ -44,8 +45,12 @@ Here's the configuration for [lazy.nvim](https://github.com/folke/lazy.nvim). No
     - Example: { ",", "、", "，" }
     - First element: The character to type with `f` or `t` (like `,` in `f,`)
     - Remaining elements: Characters to search for when typing `f,`
-- `debug (boolean)`
-    - Enable debug output for troubleshooting. Should normally be `false`.
+- `replace_semicolon (string)` (optional)
+    - Set if you want to execute repeat search with `;` using a different key.
+- `replace_comma (string)` (optional)
+    - Set if you want to execute reverse repeat search with `,` using a different key.
+- `debug (boolean)` (optional)
+    - Enable debug output for troubleshooting. Should normally be `false`. Default value is `false`.
 
 ```lua
 require("ft-mapper").setup({
@@ -68,6 +73,10 @@ require("ft-mapper").setup({
     { "-", "ー", "―", "—", "–" },
     { " ", "　" }, -- half-width and full-width spaces
   },
+  -- Use `:` instead of `>` for repeat search (optional)
+  replace_semicolon = '>',
+  -- Use `<` instead of `,` for reverse repeat search (optional)
+  replace_comma = '<',
   -- Enable debug output (optional)
   debug = false
 })

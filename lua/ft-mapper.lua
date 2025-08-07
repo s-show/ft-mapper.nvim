@@ -410,7 +410,14 @@ end
 -- 繰り返し検索用のコマンドをセットアップ
 local function setup_repeat_commands()
   -- ; で同じ方向に繰り返し
-  vim.keymap.set({ 'n', 'v', 'o' }, ';', function()
+  -- `semicolonReplacementChar` が指定されていたらその文字を繰り返しに使う
+  local semicolon_key = ''
+  if M.config.replace_semicolon == '' then
+    semicolon_key = ';'
+  else
+    semicolon_key = M.config.replace_semicolon
+  end
+  vim.keymap.set({ 'n', 'v', 'o' }, semicolon_key, function()
     if not M.last_search.command then
       -- デフォルトの動作にフォールバック
       vim.cmd('normal! ;')
@@ -444,7 +451,14 @@ local function setup_repeat_commands()
   end, { silent = true })
 
   -- , で逆方向に繰り返し
-  vim.keymap.set({ 'n', 'v', 'o' }, ',', function()
+  -- `commaReplacementChar` が指定されていたらその文字を逆方向の繰り返しに使う
+  local comma_key = ''
+  if M.config.replace_comma == '' then
+    comma_key = ','
+  else
+    comma_key = M.config.replace_comma
+  end
+  vim.keymap.set({ 'n', 'v', 'o' }, comma_key, function()
     if not M.last_search.command then
       -- デフォルトの動作にフォールバック
       vim.cmd('normal! ,')
@@ -462,12 +476,13 @@ local function setup_repeat_commands()
 
     -- オペレータペンディングモードの場合は特別な処理
     local mode = vim.api.nvim_get_mode().mode
+    local original_cmd = M.last_search.command
     if mode == 'no' then
       vim.cmd('normal! v')
       do_search(reverse_cmd[M.last_search.command], M.last_search.char, count, M.last_search.chars, true)
+      M.last_search.command = original_cmd
 
       -- f/F の場合、文字全体を選択
-      local original_cmd = M.last_search.command
       if original_cmd == 'f' or original_cmd == 'F' then
         local line = get_current_line()
         local _, current_col = get_cursor_pos()
@@ -482,6 +497,7 @@ local function setup_repeat_commands()
       end
     else
       do_search(reverse_cmd[M.last_search.command], M.last_search.char, count, M.last_search.chars, true)
+      M.last_search.command = original_cmd
     end
   end, { silent = true })
 end
@@ -502,6 +518,8 @@ function M.setup(opts)
   -- ユーザー設定を適用
   M.config = vim.tbl_deep_extend('force', {
     mappings = {},
+    replace_semicolon = '',
+    replace_comma = '',
     debug = false
   }, opts)
 
