@@ -1,0 +1,111 @@
+*ft-mapper.nvim*                                           Extend fFtT motion.
+
+Author: s-show <https://github.com/s-show>
+license: MIT License
+Repository: https://github.com/s-show/ft-mapper.nvim
+
+==============================================================================
+INTRODUCTION                                     *ft-mapper.nvim-introduction*
+
+This plugin extends the `f`, `F`, `t`, and `T` motions, allowing you to easily 
+include full-width characters in your search targets.
+You can also reassign the `;` and `,` keys used for repeat searches to other
+keys.
+
+==============================================================================
+INSTALL                                               *ft-mapper.nvim-install*
+
+lazy.nvim <https://github.com/folke/lazy.nvim>
+
+>lua
+  return {
+    's-show/extend_word_motion.nvim',
+    opts = {
+      mappings = {
+	-- required mappings
+	{ ',', '、', '，' },
+	{ '.', '。', '．' },
+      },
+    },
+  }
+>
+
+==============================================================================
+options                                               *ft-mapper.nvim-options*
+
+                                                     *ft-mapper.nvim.mappings*
+mappings
+
+Specify combinations of search characters and target characters in a 
+two-dimensional array.  
+The first element of each array specifies the search character, and the 
+subsequent elements specify the characters to be matched in the search.
+
+>lua
+  opts = {
+    mappings = {
+      { ',', '、', '，' },
+      { '.', '。', '．' },
+      { ":", "：" },
+      { ";", "；" },
+      { "!", "！" },
+      { "?", "？" },
+      { "(", "（" },
+      { ")", "）" },
+      { "[", "「", "『", "【", "［" },
+      { "]", "」", "』", "】", "］" },
+      { "'", "'", "'" },
+      { '"', "“", "”", "゛" },
+      { '<', "＜", "«" },
+      { '>', "＞", "»" },
+      { "-", "ー", "―", "—", "–" },
+      { " ", "　" }, -- half-width space, full-width space
+    },
+  }
+<
+
+Default: {}
+
+                                            *ft-mapper.nvim.replace_semicolon*
+replace_semicolon
+
+Specify this option to change the `;` key used for repeat searches to another
+character.  
+
+>lua
+  opts = {
+    replace_semicolon = ">"
+  }
+<
+
+Default: ""
+
+                                            *ft-mapper.nvim.replace_semicolon*
+replace_comma
+
+Specify this option to change the `,` key used for reverse repeat searches to 
+another character.
+
+>lua
+  opts = {
+    replace_comma = "<"
+  }
+<
+
+Default: ""
+
+                                                        *ft-mapper.nvim.debug*
+debug
+
+Enable debug output for troubleshooting. Should normally be `false`.
+
+>lua
+  opts = {
+    debug = false
+  }
+<
+
+Default: false
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:noet:
